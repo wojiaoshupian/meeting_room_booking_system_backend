@@ -9,7 +9,8 @@ interface JwtUserData {
   userId: number;
   username: string;
   roles: string[];
-  permissions: Permission[]
+  permissions: Permission[],
+  test:string
 }
 
 declare module 'express' {
@@ -56,7 +57,8 @@ export class LoginGuard implements CanActivate {
         userId: data.userId,
         username: data.username,
         roles: data.roles,
-        permissions: data.permissions
+        permissions: data.permissions,
+        test:"123"
       }
       return true;
     } catch(e) {
