@@ -1,9 +1,11 @@
 import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { Role } from "./role.entity";
+import { Exclude, Expose } from "class-transformer";
 
 @Entity({
     name: 'users'
 })
+
 export class User {
 
     @PrimaryGeneratedColumn()
@@ -20,6 +22,7 @@ export class User {
         length: 50,
         comment: '密码'
     })
+    @Exclude({ toPlainOnly: true })
     password: string;
 
     @Column({
@@ -28,10 +31,6 @@ export class User {
         comment: '昵称'
     })
     nickName: string;
-
-
-
-
 
     @Column({
         comment: '头像',
@@ -77,6 +76,10 @@ export class User {
         default: 0
     })
     loginType: LoginType;
+
+ 
+
+    
 }
 
 export enum LoginType {

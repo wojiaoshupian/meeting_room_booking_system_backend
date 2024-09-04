@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Post, Query, UnauthorizedException } from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, Get, Inject, Post, Query, UnauthorizedException, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -20,7 +20,7 @@ export class UserController {
 
   @Get("init-data")
   async initData() {
-    await this.userService.initData();
+    // await this.userService.initData();
     return 'done';
   }
 
@@ -62,19 +62,10 @@ export class UserController {
 
   @Get('info')
   @RequireLogin()
+  @UseInterceptors(ClassSerializerInterceptor)
   async info(@UserInfo('userId') userId: number) {
     const user = await this.userService.findUserDetailById(userId);
-
-    const vo = new UserDetailVo();
-    vo.id = user.id
-    vo.username = user.username;
-    vo.headPic = user.headPic;
-    vo.phoneNumber = user.phoneNumber;
-    vo.nickName = user.nickName;
-    vo.createTime = user.createTime;
-    vo.isFrozen = user.isFrozen;
-
-    return vo;
+    return user;
   }
 
   @Post(['update', 'admin/update'])
@@ -150,3 +141,4 @@ export class UserController {
 
 
 }
+
