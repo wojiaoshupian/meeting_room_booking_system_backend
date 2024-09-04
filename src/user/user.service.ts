@@ -8,6 +8,7 @@ import { Role } from './entities/role.entity';
 import { Permission } from './entities/permission.entity';
 import { LoginUserDto } from './dto/login-user.dto';
 import { LoginUserVo } from './vo/login-user.vo';
+import { UpdateUserDto } from './vo/udpate-user.dto';
 
 @Injectable()
 export class UserService {
@@ -123,29 +124,61 @@ export class UserService {
   }
 
   async findUserById(userId: number, isAdmin: boolean) {
-    const user =  await this.userRepository.findOne({
-        where: {
-            id: userId,
-            isAdmin
-        },
-        relations: [ 'roles', 'roles.permissions']
+    const user = await this.userRepository.findOne({
+      where: {
+        id: userId,
+        isAdmin
+      },
+      relations: ['roles', 'roles.permissions']
     });
 
     return {
-        id: user.id,
-        username: user.username,
-        isAdmin: user.isAdmin,
-        roles: user.roles.map(item => item.name),
-        permissions: user.roles.reduce((arr, item) => {
-            item.permissions.forEach(permission => {
-                if(arr.indexOf(permission) === -1) {
-                    arr.push(permission);
-                }
-            })
-            return arr;
-        }, [])
+      id: user.id,
+      username: user.username,
+      isAdmin: user.isAdmin,
+      roles: user.roles.map(item => item.name),
+      permissions: user.roles.reduce((arr, item) => {
+        item.permissions.forEach(permission => {
+          if (arr.indexOf(permission) === -1) {
+            arr.push(permission);
+          }
+        })
+        return arr;
+      }, [])
     }
+  }
+
+  async findUserDetailById(userId: number) {
+    const user =  await this.userRepository.findOne({
+        where: {
+            id: userId
+        }
+    });
+
+    return user;
 }
+async update(userId: number, updateUserDto: UpdateUserDto) {
+
+  const foundUser = await this.userRepository.findOneBy({
+    id: userId
+  });
+
+  if(updateUserDto.nickName) {
+      foundUser.nickName = updateUserDto.nickName;
+  }
+  if(updateUserDto.headPic) {
+      foundUser.headPic = updateUserDto.headPic;
+  }
+
+  try {
+    await this.userRepository.save(foundUser);
+    return '用户信息修改成功';
+  } catch(e) {
+    this.logger.error(e, UserService);
+    return '用户信息修改成功';
+  }
+}
+
 
 
 }
