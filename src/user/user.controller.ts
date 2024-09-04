@@ -5,7 +5,6 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { RequireLogin, UserInfo } from 'src/custom.decorator';
-import { UserDetailVo } from './vo/user-info.vo';
 import { UpdateUserDto } from './vo/udpate-user.dto';
 
 @Controller('user')
