@@ -12,6 +12,8 @@ import { UpdateUserDto } from './vo/udpate-user.dto';
 
 @Injectable()
 export class UserService {
+
+
   @InjectEntityManager()
   private entityManager: EntityManager;
   private logger = new Logger();
@@ -122,6 +124,21 @@ export class UserService {
     }
     return vo;
   }
+
+  async findUsersByPage(pageNo: number, pageSize: number) {
+    const skipCount = (pageNo - 1) * pageSize;
+
+    const [users, totalCount] = await this.userRepository.findAndCount({
+        skip: skipCount,
+        take: pageSize
+    });
+
+    return {
+        users,
+        totalCount
+    }
+}
+
 
   async freezeUserById(id: number) {
     const user = await this.userRepository.findOneBy({

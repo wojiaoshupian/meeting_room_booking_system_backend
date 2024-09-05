@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Get, HttpException, HttpStatus, Inject, Post, Query, UnauthorizedException, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Get, HttpException, HttpStatus, Inject, ParseIntPipe, Post, Query, UnauthorizedException, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -74,17 +74,35 @@ export class UserController {
     return vo;
   }
 
+  @Get('list')
+  async list(
+    @Query('pageNo', new ParseIntPipe({
+      exceptionFactory() {
+        throw new BadRequestException('pageNo 应该传数字');
+      }
+    })) pageNo: number,
+    @Query('pageSize', new ParseIntPipe({
+      exceptionFactory() {
+        throw new BadRequestException('pageSize 应该传数字');
+      }
+    })) pageSize: number
+  ) {
+    return await this.userService.findUsersByPage(pageNo, pageSize);
+  }
+
+
+
   @Get('freeze')
   async freeze(@Query('id') userId: number) {
     console.log(isEmpty(userId))
     if (isEmpty(userId)) {
       throw new HttpException('缺少参数', HttpStatus.BAD_REQUEST);
     }
-    if(isNumber(userId)){
+    if (isNumber(userId)) {
 
     }
     console.log(isNaN(toNumber(userId)))
-    if(isNaN(toNumber(userId))){
+    if (isNaN(toNumber(userId))) {
       throw new HttpException('参数不合法', HttpStatus.BAD_REQUEST);
     }
     await this.userService.freezeUserById(userId);
