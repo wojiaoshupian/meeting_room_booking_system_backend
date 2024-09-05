@@ -1,4 +1,4 @@
-import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Get, HttpException, HttpStatus, Inject, ParseIntPipe, Post, Query, UnauthorizedException, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, ClassSerializerInterceptor, Controller, DefaultValuePipe, Get, HttpException, HttpStatus, Inject, ParseIntPipe, Post, Query, UnauthorizedException, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { RequireLogin, UserInfo } from 'src/custom.decorator';
 import { UpdateUserDto } from './vo/udpate-user.dto';
 import { isEmpty, isNaN, isNumber, toNumber } from "lodash"
+import { generateParseIntPipe } from 'src/utils';
 
 @Controller('user')
 export class UserController {
@@ -76,19 +77,12 @@ export class UserController {
 
   @Get('list')
   async list(
-    @Query('pageNo', new ParseIntPipe({
-      exceptionFactory() {
-        throw new BadRequestException('pageNo 应该传数字');
-      }
-    })) pageNo: number,
-    @Query('pageSize', new ParseIntPipe({
-      exceptionFactory() {
-        throw new BadRequestException('pageSize 应该传数字');
-      }
-    })) pageSize: number
+      @Query('pageNo',new DefaultValuePipe(1), generateParseIntPipe('pageNo')) pageNo: number,
+      @Query('pageSize',new DefaultValuePipe(1), generateParseIntPipe('pageSize')) pageSize: number,
   ) {
-    return await this.userService.findUsersByPage(pageNo, pageSize);
+      return await this.userService.findUsersByPage(pageNo, pageSize);
   }
+  
 
 
 

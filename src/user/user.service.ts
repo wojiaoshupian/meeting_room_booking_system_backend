@@ -129,24 +129,26 @@ export class UserService {
     const skipCount = (pageNo - 1) * pageSize;
 
     const [users, totalCount] = await this.userRepository.findAndCount({
-        skip: skipCount,
-        take: pageSize
+      select: ['id', 'username', 'nickName', 'phoneNumber', 'isFrozen', 'headPic', 'createTime'],
+      skip: skipCount,
+      take: pageSize
     });
 
     return {
-        users,
-        totalCount
+      users,
+      totalCount
     }
-}
+  }
+
 
 
   async freezeUserById(id: number) {
     const user = await this.userRepository.findOneBy({
-        id
+      id
     });
     user.isFrozen = true;
     await this.userRepository.save(user);
-}
+  }
 
 
   async findUserById(userId: number, isAdmin: boolean) {
@@ -175,35 +177,35 @@ export class UserService {
   }
 
   async findUserDetailById(userId: number) {
-    const user =  await this.userRepository.findOne({
-        where: {
-            id: userId
-        }
+    const user = await this.userRepository.findOne({
+      where: {
+        id: userId
+      }
     });
 
     return user;
-}
-async update(userId: number, updateUserDto: UpdateUserDto) {
+  }
+  async update(userId: number, updateUserDto: UpdateUserDto) {
 
-  const foundUser = await this.userRepository.findOneBy({
-    id: userId
-  });
+    const foundUser = await this.userRepository.findOneBy({
+      id: userId
+    });
 
-  if(updateUserDto.nickName) {
+    if (updateUserDto.nickName) {
       foundUser.nickName = updateUserDto.nickName;
-  }
-  if(updateUserDto.headPic) {
+    }
+    if (updateUserDto.headPic) {
       foundUser.headPic = updateUserDto.headPic;
-  }
+    }
 
-  try {
-    await this.userRepository.save(foundUser);
-    return '用户信息修改成功';
-  } catch(e) {
-    this.logger.error(e, UserService);
-    return '用户信息修改成功';
+    try {
+      await this.userRepository.save(foundUser);
+      return '用户信息修改成功';
+    } catch (e) {
+      this.logger.error(e, UserService);
+      return '用户信息修改成功';
+    }
   }
-}
 
 
 
