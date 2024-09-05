@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Get, Inject, Post, Query, UnauthorizedException, UseInterceptors } from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, Get, HttpException, HttpStatus, Inject, Post, Query, UnauthorizedException, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { RequireLogin, UserInfo } from 'src/custom.decorator';
 import { UpdateUserDto } from './vo/udpate-user.dto';
+import { isEmpty, isNaN, isNumber, toNumber } from "lodash"
 
 @Controller('user')
 export class UserController {
@@ -56,8 +57,40 @@ export class UserController {
   @Post('admin/login')
   async adminLogin(@Body() loginUser: LoginUserDto) {
     const vo = await this.userService.login(loginUser, true);
+    vo.accessToken = this.jwtService.sign({
+      userId: vo.userInfo.id,
+      username: vo.userInfo.username,
+      roles: vo.userInfo.roles,
+      permissions: vo.userInfo.permissions
+    }, {
+      expiresIn: this.configService.get('jwt_access_token_expires_time') || '30m'
+    });
+
+    vo.refreshToken = this.jwtService.sign({
+      userId: vo.userInfo.id
+    }, {
+      expiresIn: this.configService.get('jwt_refresh_token_expres_time') || '7d'
+    });
     return vo;
   }
+
+  @Get('freeze')
+  async freeze(@Query('id') userId: number) {
+    console.log(isEmpty(userId))
+    if (isEmpty(userId)) {
+      throw new HttpException('缺少参数', HttpStatus.BAD_REQUEST);
+    }
+    if(isNumber(userId)){
+
+    }
+    console.log(isNaN(toNumber(userId)))
+    if(isNaN(toNumber(userId))){
+      throw new HttpException('参数不合法', HttpStatus.BAD_REQUEST);
+    }
+    await this.userService.freezeUserById(userId);
+    return 'success';
+  }
+
 
   @Get('info')
   @RequireLogin()

@@ -61,6 +61,7 @@ export class LoginGuard implements CanActivate {
         permissions: data.permissions,
         test:"123"
       }
+      debugger
       return true;
     } catch(e) {
       // throw new UnauthorizedException('token 失效，请重新登录');

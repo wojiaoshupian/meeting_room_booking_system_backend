@@ -123,6 +123,15 @@ export class UserService {
     return vo;
   }
 
+  async freezeUserById(id: number) {
+    const user = await this.userRepository.findOneBy({
+        id
+    });
+    user.isFrozen = true;
+    await this.userRepository.save(user);
+}
+
+
   async findUserById(userId: number, isAdmin: boolean) {
     const user = await this.userRepository.findOne({
       where: {
