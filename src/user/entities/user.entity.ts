@@ -38,6 +38,12 @@ export class User {
         nullable: true
     })
     headPic: string;
+    @Column({
+        comment: 'qianming',
+        length: 100,
+        nullable: true
+    })
+    genderSign: string;
 
     @Column({
         comment: '手机号',
