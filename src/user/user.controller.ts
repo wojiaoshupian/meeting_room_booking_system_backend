@@ -79,8 +79,10 @@ export class UserController {
   async list(
       @Query('pageNo',new DefaultValuePipe(1), generateParseIntPipe('pageNo')) pageNo: number,
       @Query('pageSize',new DefaultValuePipe(1), generateParseIntPipe('pageSize')) pageSize: number,
+      @Query('username') username: string,
+      @Query('nickName') nickName: string,
   ) {
-      return await this.userService.findUsersByPage(pageNo, pageSize);
+      return await this.userService.findUsers(username, nickName,pageNo, pageSize);
   }
   
 

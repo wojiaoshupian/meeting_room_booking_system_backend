@@ -11,6 +11,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { APP_GUARD } from '@nestjs/core';
 import { LoginGuard } from './login.guard';
 import { PermissionGuard } from './permission.guard';
+import  { join } from 'path';
+
+
 
 @Module({
   imports: [ 
@@ -30,7 +33,8 @@ import { PermissionGuard } from './permission.guard';
     UserModule,
     ConfigModule.forRoot({
       isGlobal:true,
-      envFilePath:'src/.env'
+      // envFilePath:'src/.env'
+      envFilePath:join(__dirname,'.env')
     }),
     TypeOrmModule.forRootAsync({
       useFactory(configService: ConfigService) {

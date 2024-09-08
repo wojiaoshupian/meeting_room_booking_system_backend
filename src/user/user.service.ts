@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { md5 } from 'src/utils';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, Like, Repository } from 'typeorm';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { User } from './entities/user.entity';
 import { Role } from './entities/role.entity';
@@ -125,20 +125,32 @@ export class UserService {
     return vo;
   }
 
-  async findUsersByPage(pageNo: number, pageSize: number) {
+  async findUsers(username: string, nickName: string, pageNo: number, pageSize: number) {
     const skipCount = (pageNo - 1) * pageSize;
 
+    const condition: Record<string, any> = {};
+
+    if(username) {
+        condition.username = Like(`%${username}%`);   
+    }
+    if(nickName) {
+        condition.nickName = Like(`%${nickName}%`); 
+    }
+  
+
     const [users, totalCount] = await this.userRepository.findAndCount({
-      select: ['id', 'username', 'nickName', 'phoneNumber', 'isFrozen', 'headPic', 'createTime'],
-      skip: skipCount,
-      take: pageSize
+        select: ['id', 'username', 'nickName', 'phoneNumber', 'isFrozen', 'headPic', 'createTime'],
+        skip: skipCount,
+        take: pageSize,
+        where: condition
     });
 
     return {
-      users,
-      totalCount
+        users,
+        totalCount
     }
-  }
+}
+
 
 
 
